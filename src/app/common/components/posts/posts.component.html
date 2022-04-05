@@ -1,0 +1,186 @@
+<div class="container">
+    <div class="row">
+        <div *ngIf="posts?.length>0">
+            <div class="col-6 offset-3 mt-5 shadow mb-5 bg-body rounded" *ngFor="let post of posts">
+                <div class="post">
+                    <div class="post-header p-3">
+                        <div class="post-action float-end" *ngIf="post?.user?._id===currentUser?._id">
+                            <span><i class="me-4 bi bi-pencil-fill clickable" (click)="selectPost(post)"
+                                    data-bs-toggle="modal" data-bs-target="#updatePostModal"></i></span>
+                            <span><i class="bi bi-x-lg clickable" (click)="deletePost(post)"></i></span>
+                        </div>
+                        <div class="post-user-profile">
+                            <div class="post-user-avatar float-start me-3">
+                                <a [routerLink]="['../../../users/profile/',post?.user?._id]"
+                                    class="text-dark text-decoration-none">
+
+                                    <img [src]="imageUrl+post?.user?.file" class="img-responsive rounded-circle"
+                                        style="width:35px;height: 35px;" />
+                                </a>
+                            </div>
+                            <div class="post-user-name ">
+                                <a [routerLink]="['../../../users/profile/',post?.user?._id]"
+                                    class="text-dark text-decoration-none">
+                                    <strong>{{post?.user?.name}}</strong>
+                                </a>
+                            </div>
+
+                            <div class="post-timestamp mb-3">
+                                <p class="text-muted fs-6">{{post?.updatedAt | date:'short'}}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="post-body">
+                        <div class="post-caption  p-2" [innerHTML]="post?.message">
+
+                        </div>
+                        <div class="post-image" *ngIf="post?.postFile">
+                            <img [src]="postImageUrl+post?.postFile" class="img-fluid "
+                                style="width:100%;height: inherit" />
+                        </div>
+                        <div class="post-like-count mt-2" *ngIf="post?.likes?.length>0">
+                            <span class="text-primary fs-5 clickable" (click)="toggleLikedBy(post)"
+                                data-bs-toggle="modal" data-bs-target="#likedByModel">
+                                <i class="bi bi-hand-thumbs-up-fill"></i>
+                            </span>
+                            <span>{{post?.likes?.length}}</span>
+                        </div>
+                    </div>
+                    <div class="post-footer">
+                        <hr />
+                        <div class="d-inline-block ms-5">
+                            <like [isLiked]="isLiked(post?.likes)" (likeEvent)="toggleLikePost($event,post)"></like>
+                        </div>
+                        <div class="d-inline-block float-end me-5">
+
+                            <toggle-comments (toggleCommentEvent)="toggleComments(post)" [post]="post">
+                            </toggle-comments>
+                        </div>
+
+                        <div class="post-comments" *ngIf="post?.isExpanded">
+                            <hr />
+                            <div>
+                                <comments [user]="currentUser" [post]="post"></comments>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" id="likedByModel">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Liked By</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="d-flex col-12 mt-2  bg-body rounded" style="overflow-x: auto; white-space: nowrap;">
+                            <div *ngFor="let user of likedBy" class="mb-2">
+                                <div class="card mx-2" style="width: 80px">
+                                    <a class="text-dark" [routerLink]="['../../../users/profile',user?._id]"
+                                        data-bs-toggle="tooltip" data-bs-dismiss="modal" data-bs-placement="bottom"
+                                        [title]="'View '+user?.name + ' Profile'">
+                                        <div>
+
+                                            <img [src]="imageUrl+user?.file" style="width:75px;height: 75px;"
+                                                class="rounded-circle card-img-top img-responsive" alt="...">
+
+                                            <div class="card-body  ">
+                                                <strong class="card-title text-truncate d-inline-block"
+                                                    style="max-width: 60px;">{{user?.name?.split(" ")[0]}}</strong>
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </div>
+                            <div *ngIf="likedBy?.length ===0" class="mb-2">
+                                You don't have Add from <a [routerLink]="['../../']">here</a>. </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="updatePostModal" tabindex="-1" aria-labelledby="update" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="update">Update Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    (click)="updatePostImageUrl('')"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="form" (ngSubmit)="updatePost()">
+                    <div class="mb-3 input-group">
+                        <label for="message" class="form-label">Caption<span class="required">*</span></label>
+                        <input type="text" formControlName="message" name="message" id="message" class="form-control"
+                            [value]="message.value" #caption>
+                        <button class="btn btn-secondary input-group-text" [ngxClipboard]="caption" (click)="copied()">
+                            <i class="bi bi-check2-all"></i>Copy to
+                            clipboard</button>
+                        <div *ngIf="!message.valid && message.touched">
+                            <div class="text-danger" *ngIf="message.errors?.['required']">Caption is required</div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Image</label>
+                        <label class="btn">
+                            <span>
+                                <div class="text-center m-2"
+                                    *ngIf="(selectedPost?.postFile || localPostImageUrl) && (postFile.value || localPostImageUrl)">
+                                    <img [src]="(localPostImageUrl ) || (selectedPostImageUrl+selectedPost?.postFile) | sanitizerUrl"
+                                        alt="..." class="img-fluid img-thumbnail rounded h-50 w-50" />
+
+                                </div>
+                                <div class="text-center m-2 h-50 w-50"
+                                    *ngIf="!selectedPost?.postFile && (!postFile.value || !localPostImageUrl)">
+                                    <i class="bi bi-image h-50 w-50"></i>
+                                </div>
+                            </span>
+                            <input type="file" style="display:none" class="form-control" name="file"
+                                (change)="onFileSelect($event)" formControlName="postFile" name="postFile"
+                                id="postFile" />
+
+                            <div *ngIf="!postFile.valid && postFile.touched">
+                                <div class="text-danger" *ngIf="postFile.errors?.['required']">Post Image is required
+                                </div>
+                                <div class="text-danger" *ngIf="postFile.errors?.['invalidFileExtension']">Only jpg and
+                                    png
+                                    files
+                                    are allowed</div>
+                            </div>
+                        </label>
+
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="Update" [disabled]="!form.valid"
+                            data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            (click)="updatePostImageUrl('')">Close</button>
+
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="b"></div>

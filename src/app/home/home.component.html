@@ -1,0 +1,18 @@
+<div class="container">
+    <div class="row">
+        <div class=" mt-2  shadow p-3 mb-2 bg-body rounded text-center" *ngIf="currentUser?._id">
+            <div class="float-start mx-5">
+                <img [src]="imageUrl+currentUser?.file" class="img-responsive " style="width:100px;height: 100px;"
+                    *ngIf="currentUser?.file" />
+                <h2 class="text-center">{{currentUser?.name}}</h2>
+            </div>
+            <post-form (newPostEvent)="addNewPost($event)" [user]="currentUser">
+            </post-form>
+        </div>
+        <div *ngIf="!currentUser?._id" class="alert alert-danger alert-dismissible fade show text-center">
+            <strong>Login to post</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <posts [user]="currentUser" [currentUser]="currentUser" [posts]="posts"></posts>
+    </div>
+</div>

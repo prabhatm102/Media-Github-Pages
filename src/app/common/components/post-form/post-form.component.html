@@ -1,0 +1,46 @@
+<div class="container">
+    <div class="row">
+        <div class="col-6 offset-3 shadow p-3 mb-5 bg-body rounded">
+            <form [formGroup]="form" (ngSubmit)="post()">
+                <div class="input-group mb-3">
+                    <input type="text" formControlName="message" name="message" id="message" class="form-control"
+                        placeholder="Post something.....">
+                    <div *ngIf="!message.valid && message.touched">
+                        <div class="text-danger" *ngIf="message.errors?.['required']">message is required</div>
+
+                    </div>
+                    <span class="input-group-text">
+                        <label class="btn">
+                            <i class="bi bi-image"></i>
+                            <input type="file" style="display:none" class="form-control" name="postFile"
+                                (change)="onFileSelect($event)" formControlName="postFile" name="postFile"
+                                id="postFile" />
+
+                            <div *ngIf="!postFile.valid && postFile.touched">
+                                <div class="text-danger" *ngIf="postFile.errors?.['invalidFileExtension']">Only jpg and
+                                    png
+                                    files
+                                    are allowed</div>
+                            </div>
+                        </label>
+                    </span>
+                    <button type="submit" class="btn btn-primary mx-2" [disabled]="!form.valid"><i
+                            class="bi bi-send-fill"></i></button>
+                </div>
+
+
+
+                <div *ngIf="localPostImageUrl">
+                    <span>
+                        <div class="text-center m-2">
+                            <img [src]="localPostImageUrl | sanitizerUrl" alt="..."
+                                class="img-fluid img-thumbnail rounded h-25 w-25" />
+                        </div>
+                    </span>
+                </div>
+
+                <!-- <quill-editor class="content-editor" [placeholder]="''"> </quill-editor> -->
+            </form>
+        </div>
+    </div>
+</div>

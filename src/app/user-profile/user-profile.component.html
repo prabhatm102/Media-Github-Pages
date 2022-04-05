@@ -1,0 +1,38 @@
+<div class="container">
+    <div class="row">
+        <div class=" mt-2 shadow p-3 mb-2 bg-body rounded text-center" *ngIf="user?._id">
+            <img [src]="imageUrl+user?.file" class="img-responsive " style="width:100px;height: 100px;"
+                *ngIf="user?.file" />
+            <h2 class="text-center">{{user?.name}}</h2>
+
+            <div *ngIf="user?._id!==currentUser?._id">
+                <button class="btn btn-sm " [ngClass]="
+                                            {
+                                                'btn-outline-danger':user?.status==='Remove Friend','btn-outline-primary':user?.status==='Send Request','btn-outline-secondary':user?.status==='Cancel Request','btn-outline-success':user?.status==='sent'
+                                            }">
+                    <i class="bi " [ngClass]="
+                                                {
+                                                'bi-dash-circle-fill':user?.status==='Remove Friend','bi-person-plus-fill':user?.status==='Send Request','bi-x-circle-fill':user?.status==='Cancel Request','bi-check-circle':user?.status==='sent'
+                                            }
+                                                "></i>
+                    <span class="mx-1">{{user?.status==="sent"?'Accept':user?.status}}</span>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary mx-2" *ngIf="user?.status==='sent'">
+                    <i class="bi bi-x-circle-fill"></i>
+                    <span class="mx-1">Cancel</span>
+                </button>
+            </div>
+            <friends-card [friends]="user?.friends"></friends-card>
+
+            <post-form *ngIf="user?._id===currentUser?._id" (newPostEvent)="addNewPost($event)" [user]="user">
+            </post-form>
+        </div>
+        <posts *ngIf="user?._id" [user]="user" [currentUser]="currentUser" [posts]="posts"></posts>
+    </div>
+    <div class="row">
+        <div *ngIf="!user?._id" class="alert alert-danger alert-dismissible fade show text-center">
+            <strong>Cannot find user!</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
