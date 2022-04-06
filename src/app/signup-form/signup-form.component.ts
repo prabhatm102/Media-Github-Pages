@@ -105,7 +105,7 @@ export class SignupFormComponent implements OnInit {
             this.toastr.error('Something went wrong!', '', {
               progressBar: true,
               closeButton: true,
-              timeOut: 1000,
+              timeOut: 500,
             });
           }
         }

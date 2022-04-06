@@ -4,6 +4,9 @@ import { PostsService } from 'src/app/services/posts.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 import { ToastrService } from 'ngx-toastr';
+import { UnauthorisedError } from '../../unauthorised-error';
+import { BadInput } from '../../bad-input';
+import { NotFoundError } from '../../not-found-error';
 
 @Component({
   selector: 'posts',
@@ -33,7 +36,7 @@ export class PostsComponent implements OnInit {
     this.selectedPostImageUrl = environment.postImageUrl;
 
     this.form = fb.group({
-      message: fb.control('', [Validators.required]),
+      message: fb.control(''),
       postFile: fb.control(''),
       fileSource: fb.control(''),
     });
@@ -72,9 +75,12 @@ export class PostsComponent implements OnInit {
               progressBar: true,
               closeButton: true,
               onActivateTick: false,
+              timeOut: 500,
             });
           },
-          (error: Response) => {}
+          (error: Response) => {
+            this.handleError(error);
+          }
         );
       }
     });
@@ -90,21 +96,60 @@ export class PostsComponent implements OnInit {
   }
 
   toggleLikePost(isLiked: any, post: any) {
-    this.service.likePost(post._id).subscribe((response) => {
+    if (!this.currentUser?._id) {
+      this.toastr.warning('', 'Login to like post!', {
+        progressBar: true,
+        closeButton: true,
+        timeOut: 500,
+      });
+      return;
+    }
+    if (isLiked) {
       let index = this.posts.findIndex((p: any) => p._id === post._id);
       if (index !== -1) {
-        this.posts[index].likes = JSON.parse(JSON.stringify(response))?.likes;
+        this.posts[index].likes.push(this.currentUser);
       }
-    });
+    } else {
+      let index = this.posts.findIndex((p: any) => p._id === post._id);
+      if (index !== -1) {
+        this.posts[index].likes = this.posts[index].likes.filter(
+          (u: any) => u?._id !== this.currentUser?._id
+        );
+      }
+    }
+
+    this.service.likePost(post._id).subscribe(
+      (response) => {
+        // let index = this.posts.findIndex((p: any) => p._id === post._id);
+        // if (index !== -1) {
+        //   this.posts[index].likes = JSON.parse(JSON.stringify(response))?.likes;
+        // }
+      },
+      (error) => {
+        this.handleError(error);
+        if (!isLiked) {
+          let index = this.posts.findIndex((p: any) => p._id === post._id);
+          if (index !== -1) {
+            this.posts[index].likes.push(this.currentUser);
+          }
+        } else {
+          let index = this.posts.findIndex((p: any) => p._id === post._id);
+          if (index !== -1) {
+            this.posts[index].likes.splice(this.currentUser);
+          }
+        }
+      }
+    );
   }
 
   toggleLikedBy(post: any) {
     this.likedBy = post.likes;
   }
+
   selectPost(post: any) {
     this.selectedPost = post;
 
-    this.form.controls['message'].value = post?.message;
+    this.form.controls['message'].value = post?.message || '';
     this.form.controls['postFile'].value = post?.postFile;
     this.form.controls['fileSource'].value = '';
 
@@ -136,7 +181,7 @@ export class PostsComponent implements OnInit {
   }
 
   updatePost() {
-    if (!this.form.valid) return;
+    if (!this.form.valid || !this.currentUser?._id) return;
 
     let formData = new FormData();
     formData.append('message', this.form.get('message').value);
@@ -149,16 +194,15 @@ export class PostsComponent implements OnInit {
       postFile: this.form.get('postFile').value,
     };
 
-    let prevdata = {
-      name: this.selectedPost?.message,
+    let prevData = {
+      name: this.selectedPost?.message || '',
       postFile: this.selectedPost?.postFile,
     };
 
-    if (JSON.stringify(newData) === JSON.stringify(prevdata)) return;
+    if (JSON.stringify(newData) === JSON.stringify(prevData)) return;
 
-    this.service
-      .update(this.selectedPost?._id, formData)
-      .subscribe((response) => {
+    this.service.update(this.selectedPost?._id, formData).subscribe(
+      (response) => {
         let index = this.posts.findIndex(
           (u: any) => u._id === this.selectedPost._id
         );
@@ -169,8 +213,13 @@ export class PostsComponent implements OnInit {
           progressBar: true,
           closeButton: true,
           onActivateTick: false,
+          timeOut: 500,
         });
-      });
+      },
+      (error) => {
+        this.handleError(error);
+      }
+    );
   }
 
   copied() {
@@ -180,5 +229,28 @@ export class PostsComponent implements OnInit {
       closeButton: true,
       onActivateTick: false,
     });
+  }
+
+  handleError(error: any) {
+    if (
+      error instanceof UnauthorisedError ||
+      error instanceof BadInput ||
+      error instanceof NotFoundError
+    )
+      this.toastr.error(
+        error?.originalError?.error?.message || 'Not Found',
+        error?.originalError?.status,
+        {
+          progressBar: true,
+          closeButton: true,
+          timeOut: 500,
+        }
+      );
+    else
+      this.toastr.error('Something went wrong!', '500', {
+        progressBar: true,
+        closeButton: true,
+        timeOut: 500,
+      });
   }
 }

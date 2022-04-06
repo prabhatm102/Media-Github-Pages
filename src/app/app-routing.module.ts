@@ -42,8 +42,8 @@ const routes: Routes = [
   },
 
   { path: '', component: HomeComponent },
-  { path: 'test', component: NewCourseFormComponent, canActivate: [AuthGuard] },
-  { path: 'posts', component: DummyPostsComponent, canActivate: [AuthGuard] },
+  // { path: 'test', component: NewCourseFormComponent, canActivate: [AuthGuard] },
+  // { path: 'posts', component: DummyPostsComponent, canActivate: [AuthGuard] },
   { path: '**', component: NotfoundComponent },
 ];
 

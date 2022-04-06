@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { AppError } from '../common/app-error';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../shared/auth.service';
 import Swal from 'sweetalert2';
 import { FormBuilder, Validators } from '@angular/forms';
 import { environment } from '../../environments/environment';
+import { SocketService } from '../services/socket.service';
+import { ToastrService } from 'ngx-toastr';
+import { UnauthorisedError } from '../common/unauthorised-error';
+import { NotFoundError } from '../common/not-found-error';
+import { BadInput } from '../common/bad-input';
 
 @Component({
   selector: 'users',
@@ -22,7 +26,9 @@ export class UsersComponent implements OnInit {
   constructor(
     private service: UserService,
     private auth: AuthService,
-    fb: FormBuilder
+    fb: FormBuilder,
+    private socket: SocketService,
+    private toastr: ToastrService
   ) {
     this.imageUrl = environment.imageUrl;
     this.form = fb.group({
@@ -67,9 +73,24 @@ export class UsersComponent implements OnInit {
     this.currentUser = this.auth.getDecodedAccessToken(
       localStorage.getItem('authToken') || ''
     );
+    this.socket.joinRoom(this.currentUser._id);
 
-    this.service.getAll().subscribe((response) => {
-      this.users = this.friendStatus(response);
+    this.service.getAll().subscribe(
+      (response) => {
+        this.users = this.friendStatus(response);
+      },
+      (error) => {
+        this.handleError(error);
+      }
+    );
+
+    this.socket.OnFriendRequest().subscribe((response: any) => {
+      let index = this.users.findIndex((u: any) => u?._id === response?._id);
+      this.users[index] = this.friendStatus([response])[0];
+    });
+    this.socket.OnCancelRequest().subscribe((response: any) => {
+      let index = this.users.findIndex((u: any) => u?._id === response?._id);
+      this.users[index] = this.friendStatus([response])[0];
     });
   }
 
@@ -111,7 +132,9 @@ export class UsersComponent implements OnInit {
 
             Swal.fire('Deleted!', 'User has been deleted.', 'success');
           },
-          (error: Response) => {}
+          (error) => {
+            this.handleError(error);
+          }
         );
       }
     });
@@ -135,7 +158,7 @@ export class UsersComponent implements OnInit {
     this.form.controls['fileSource'].setErrors();
   }
   updateUser() {
-    if (!this.form.valid) return;
+    if (!this.form.valid || this.currentUser?._id) return;
 
     let formData = new FormData();
     formData.append('name', this.form.get('name').value);
@@ -169,9 +192,8 @@ export class UsersComponent implements OnInit {
 
     if (JSON.stringify(newData) === JSON.stringify(prevdata)) return;
 
-    this.service
-      .update(this.selectedUser?._id, formData)
-      .subscribe((response) => {
+    this.service.update(this.selectedUser?._id, formData).subscribe(
+      (response) => {
         let index = this.users.findIndex(
           (u: any) => u._id === this.selectedUser._id
         );
@@ -185,7 +207,13 @@ export class UsersComponent implements OnInit {
           );
         }
         this.selectedUser = '';
-      });
+      },
+      (error) => {
+        this.form.reset();
+        this.localImageUrl = '';
+        this.handleError(error);
+      }
+    );
   }
 
   updateImageUrl(url: any) {
@@ -233,5 +261,63 @@ export class UsersComponent implements OnInit {
         this.localImageUrl = URL.createObjectURL(event.target.files[0]);
       }
     }
+  }
+
+  handleFriendRequest(user: any, status?: string) {
+    if (
+      (user?.status === 'Send Request' || user?.status === 'sent') &&
+      !status
+    ) {
+      this.service.addFriend(user._id).subscribe(
+        (response) => {
+          let index = this.users.indexOf(user);
+
+          this.users[index] = this.friendStatus([response])[0];
+          return;
+        },
+        (error) => {
+          this.handleError(error);
+        }
+      );
+    }
+
+    if (
+      user?.status === 'Remove Friend' ||
+      user?.status === 'Cancel Request' ||
+      status
+    ) {
+      this.service.cancelFriend(user._id).subscribe(
+        (response) => {
+          let index = this.users.indexOf(user);
+          this.users[index] = this.friendStatus([response])[0];
+        },
+        (error) => {
+          this.handleError(error);
+        }
+      );
+    }
+  }
+
+  handleError(error: any) {
+    if (
+      error instanceof UnauthorisedError ||
+      error instanceof BadInput ||
+      error instanceof NotFoundError
+    )
+      this.toastr.error(
+        error?.originalError?.error?.message || 'Not Found',
+        error?.originalError?.status,
+        {
+          progressBar: true,
+          closeButton: true,
+          timeOut: 500,
+        }
+      );
+    else
+      this.toastr.error('Something went wrong!', '500', {
+        progressBar: true,
+        closeButton: true,
+        timeOut: 500,
+      });
   }
 }

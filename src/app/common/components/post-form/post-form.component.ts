@@ -1,7 +1,11 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { PostsService } from 'src/app/services/posts.service';
 import { environment } from 'src/environments/environment';
+import { BadInput } from '../../bad-input';
+import { NotFoundError } from '../../not-found-error';
+import { UnauthorisedError } from '../../unauthorised-error';
 // import { EventEmitter } from 'stream';
 
 @Component({
@@ -15,7 +19,11 @@ export class PostFormComponent implements OnInit {
   form: any;
   localPostImageUrl: string = '';
 
-  constructor(private fb: FormBuilder, private service: PostsService) {
+  constructor(
+    private fb: FormBuilder,
+    private service: PostsService,
+    private toastr: ToastrService
+  ) {
     this.form = this.fb.group({
       message: fb.control('', []),
       postFile: fb.control('', []),
@@ -36,7 +44,8 @@ export class PostFormComponent implements OnInit {
   post() {
     if (
       !this.form.valid ||
-      (!this.form.get('message').value && !this.form.get('fileSource').value)
+      (!this.form.get('message').value && !this.form.get('fileSource').value) ||
+      !this.user?._id
     )
       return;
 
@@ -48,11 +57,18 @@ export class PostFormComponent implements OnInit {
       formData.append('postFile', this.form.get('fileSource').value);
     }
 
-    this.service.createById(this?.user?._id, formData).subscribe((response) => {
-      this.newPostEvent.emit(response);
-      this.form.reset();
-      this.localPostImageUrl = '';
-    });
+    this.service.createById(this?.user?._id, formData).subscribe(
+      (response) => {
+        this.newPostEvent.emit(response);
+        this.form.reset();
+        this.localPostImageUrl = '';
+      },
+      (error) => {
+        this.form.reset();
+        this.localPostImageUrl = '';
+        this.handleError(error);
+      }
+    );
   }
 
   // updateImageUrl(url: any) {
@@ -75,5 +91,28 @@ export class PostFormComponent implements OnInit {
       this.localPostImageUrl = URL.createObjectURL(event.target.files[0]);
       this.form.controls['postFile'].touched = true;
     }
+  }
+
+  handleError(error: any) {
+    if (
+      error instanceof UnauthorisedError ||
+      error instanceof BadInput ||
+      error instanceof NotFoundError
+    )
+      this.toastr.error(
+        error?.originalError?.error?.message || 'Not Found',
+        error?.originalError?.status,
+        {
+          progressBar: true,
+          closeButton: true,
+          timeOut: 800,
+        }
+      );
+    else
+      this.toastr.error('Something went wrong!', '500', {
+        progressBar: true,
+        closeButton: true,
+        timeOut: 800,
+      });
   }
 }

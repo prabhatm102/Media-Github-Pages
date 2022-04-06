@@ -5,6 +5,10 @@ import { PostsService } from '../services/posts.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../shared/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { SocketService } from '../services/socket.service';
+import { UnauthorisedError } from '../common/unauthorised-error';
+import { BadInput } from '../common/bad-input';
+import { NotFoundError } from '../common/not-found-error';
 
 @Component({
   selector: 'user-profile',
@@ -22,6 +26,7 @@ export class UserProfileComponent implements OnInit {
     private service: UserService,
     private auth: AuthService,
     private postService: PostsService,
+    private socket: SocketService,
     private toastr: ToastrService
   ) {
     this.imageUrl = environment.imageUrl;
@@ -32,35 +37,50 @@ export class UserProfileComponent implements OnInit {
       localStorage.getItem('authToken') || ''
     );
 
-    this.route.paramMap.subscribe((params) => {
-      let id = params.get('id');
-      this.service.getById(id).subscribe((response) => {
-        this.user = response;
+    this.socket.joinRoom(this.currentUser?._id);
 
-        let friend = this.user?.friends.find(
-          (f: any) => f?.user?._id === this.currentUser?._id
+    this.route.paramMap.subscribe(
+      (params) => {
+        let id = params.get('id');
+        this.service.getById(id).subscribe(
+          (response) => {
+            this.user = response;
+
+            // let friend = this.user?.friends.find(
+            //   (f: any) => f?.user?._id === this.currentUser?._id
+            // );
+            this.friendStatus();
+          },
+          (error) => {
+            this.handleError(error);
+          }
         );
 
-        if (this.currentUser) {
-          if (friend && friend.status) {
-            if (friend.status === 'pending') {
-              this.user.status = 'Cancel Request';
-            } else if (friend.status === 'sent') {
-              this.user.status = 'sent';
-            } else if (friend.status === 'requested') {
-              this.user.status = 'Cancel Request';
-            } else if (friend.status === 'success') {
-              this.user.status = 'Remove Friend';
-            }
-          } else {
-            this.user.status = 'Send Request';
+        this.postService.getByUserId(id).subscribe(
+          (response) => {
+            this.posts = response;
+          },
+          (error) => {
+            this.handleError(error);
           }
-        }
-      });
+        );
+      },
+      (error) => {
+        this.handleError(error);
+      }
+    );
 
-      this.postService.getByUserId(id).subscribe((response) => {
-        this.posts = response;
-      });
+    this.socket.OnFriendRequest().subscribe((response: any) => {
+      if (this.user?._id === response?._id) {
+        this.user = response;
+        this.friendStatus();
+      }
+    });
+    this.socket.OnCancelRequest().subscribe((response: any) => {
+      if (this.user?._id === response?._id) {
+        this.user = response;
+        this.friendStatus();
+      }
     });
   }
   addNewPost(event: Event) {
@@ -69,6 +89,86 @@ export class UserProfileComponent implements OnInit {
       progressBar: true,
       closeButton: true,
       onActivateTick: false,
+      timeOut: 500,
     });
+  }
+
+  handleFriendRequest(user: any, status?: string) {
+    if (
+      (user?.status === 'Send Request' || user?.status === 'sent') &&
+      !status
+    ) {
+      this.service.addFriend(user._id).subscribe(
+        (response) => {
+          this.user = response;
+          this.friendStatus();
+          return;
+        },
+        (error) => {
+          this.handleError(error);
+        }
+      );
+    }
+
+    if (
+      user?.status === 'Remove Friend' ||
+      user?.status === 'Cancel Request' ||
+      status
+    ) {
+      this.service.cancelFriend(user._id).subscribe(
+        (response) => {
+          this.user = response;
+          this.friendStatus();
+        },
+        (error) => {
+          this.handleError(error);
+        }
+      );
+    }
+  }
+
+  friendStatus() {
+    let friend = this.user?.friends.find(
+      (f: any) => f?.user?._id === this.currentUser?._id
+    );
+
+    if (this.currentUser) {
+      if (friend && friend.status) {
+        if (friend.status === 'pending') {
+          this.user.status = 'Cancel Request';
+        } else if (friend.status === 'sent') {
+          this.user.status = 'sent';
+        } else if (friend.status === 'requested') {
+          this.user.status = 'Cancel Request';
+        } else if (friend.status === 'success') {
+          this.user.status = 'Remove Friend';
+        }
+      } else {
+        this.user.status = 'Send Request';
+      }
+    }
+  }
+
+  handleError(error: any) {
+    if (
+      error instanceof UnauthorisedError ||
+      error instanceof BadInput ||
+      error instanceof NotFoundError
+    )
+      this.toastr.error(
+        error?.originalError?.error?.message || 'Not Found',
+        error?.originalError?.status,
+        {
+          progressBar: true,
+          closeButton: true,
+          timeOut: 500,
+        }
+      );
+    else
+      this.toastr.error('Something went wrong!', '500', {
+        progressBar: true,
+        closeButton: true,
+        timeOut: 500,
+      });
   }
 }

@@ -37,7 +37,16 @@ import { AuthService } from './shared/auth.service';
 import { NGCComponent } from './ngc/ngc.component';
 import { ClipboardModule } from 'ngx-clipboard';
 import { ToastrModule } from 'ngx-toastr';
+import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
+import { environment } from 'src/environments/environment';
 // import { QuillModule } from 'ngx-quill';
+
+const config: SocketIoConfig = {
+  url: environment.socketUrl, // socket server url;
+  options: {
+    transports: ['websocket'],
+  },
+};
 
 @NgModule({
   declarations: [
@@ -74,8 +83,15 @@ import { ToastrModule } from 'ngx-toastr';
     ReactiveFormsModule,
     HttpClientModule,
     ClipboardModule,
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot({
+      maxOpened: 1,
+      preventDuplicates: true,
+      resetTimeoutOnDuplicate: true,
+      includeTitleDuplicates: true,
+      autoDismiss: true,
+    }),
     BrowserAnimationsModule,
+    SocketIoModule.forRoot(config),
     // QuillModule,
   ],
   providers: [

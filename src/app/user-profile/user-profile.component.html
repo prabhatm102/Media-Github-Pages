@@ -6,7 +6,7 @@
             <h2 class="text-center">{{user?.name}}</h2>
 
             <div *ngIf="user?._id!==currentUser?._id">
-                <button class="btn btn-sm " [ngClass]="
+                <button class="btn btn-sm " (click)="handleFriendRequest(user)" [ngClass]="
                                             {
                                                 'btn-outline-danger':user?.status==='Remove Friend','btn-outline-primary':user?.status==='Send Request','btn-outline-secondary':user?.status==='Cancel Request','btn-outline-success':user?.status==='sent'
                                             }">
@@ -17,15 +17,17 @@
                                                 "></i>
                     <span class="mx-1">{{user?.status==="sent"?'Accept':user?.status}}</span>
                 </button>
-                <button class="btn btn-sm btn-outline-secondary mx-2" *ngIf="user?.status==='sent'">
+                <button class="btn btn-sm btn-outline-secondary mx-2" *ngIf="user?.status==='sent'"
+                    (click)="handleFriendRequest(user,'cancel')">
                     <i class="bi bi-x-circle-fill"></i>
                     <span class="mx-1">Cancel</span>
                 </button>
             </div>
             <friends-card [friends]="user?.friends"></friends-card>
-
-            <post-form *ngIf="user?._id===currentUser?._id" (newPostEvent)="addNewPost($event)" [user]="user">
-            </post-form>
+            <div class="offset-4">
+                <post-form *ngIf="user?._id===currentUser?._id" (newPostEvent)="addNewPost($event)" [user]="user">
+                </post-form>
+            </div>
         </div>
         <posts *ngIf="user?._id" [user]="user" [currentUser]="currentUser" [posts]="posts"></posts>
     </div>

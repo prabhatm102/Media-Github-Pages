@@ -14,7 +14,7 @@ export class LikeComponent implements OnInit {
   ngOnInit(): void {}
 
   raiseLikeEvent(isLiked: Boolean): void {
-    this.isLiked = isLiked;
+    // this.isLiked = isLiked;
     this.likeEvent.emit(isLiked);
   }
 }

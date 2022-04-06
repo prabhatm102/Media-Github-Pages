@@ -124,12 +124,12 @@
             <div class="modal-body">
                 <form [formGroup]="form" (ngSubmit)="updatePost()">
                     <div class="mb-3 input-group">
-                        <label for="message" class="form-label">Caption<span class="required">*</span></label>
+                        <label for="message" class="form-label me-2">Caption</label>
                         <input type="text" formControlName="message" name="message" id="message" class="form-control"
-                            [value]="message.value" #caption>
-                        <button class="btn btn-secondary input-group-text" [ngxClipboard]="caption" (click)="copied()">
-                            <i class="bi bi-check2-all"></i>Copy to
-                            clipboard</button>
+                            [value]="message?.value" #caption>
+                        <button type="button" class="btn btn-outline-success input-group-text" [ngxClipboard]="caption"
+                            (click)="copied()">
+                            <i class="bi bi-clipboard-check"></i></button>
                         <div *ngIf="!message.valid && message.touched">
                             <div class="text-danger" *ngIf="message.errors?.['required']">Caption is required</div>
 

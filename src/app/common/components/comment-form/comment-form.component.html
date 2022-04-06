@@ -3,7 +3,7 @@
         <div class="col shadow p-3 mb-5 bg-body rounded">
             <form [formGroup]="form" (ngSubmit)="comment()">
                 <div class="input-group mb-3">
-                    <a [routerLink]="['../',user?._id]" class="text-dark text-decoration-none">
+                    <a [routerLink]="['../',user?._id]" class="text-dark text-decoration-none" *ngIf="user?.file">
                         <img [src]="imageUrl+user?.file" class="p-0 me-2 border-0 img-responsive"
                             style="width:50px;height: 50px;" />
                     </a>

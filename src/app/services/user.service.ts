@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 import { DataService } from './data.service';
 
 @Injectable({
@@ -7,6 +8,6 @@ import { DataService } from './data.service';
 })
 export class UserService extends DataService {
   constructor(http: HttpClient) {
-    super('http://192.168.1.35:5000/api/users', http);
+    super(environment.apiUrl + 'users', http);
   }
 }

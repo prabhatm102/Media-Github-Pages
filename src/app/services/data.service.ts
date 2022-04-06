@@ -7,6 +7,7 @@ import { BadInput } from '../common/bad-input';
 import { NotFoundError } from '../common/not-found-error';
 import { AuthService } from '../shared/auth.service';
 import { AlreadyExistsError } from '../common/already-exists-error';
+import { UnauthorisedError } from '../common/unauthorised-error';
 
 // @Injectable({
 //   providedIn: 'root'
@@ -108,10 +109,39 @@ export class DataService {
       .pipe(catchError((error: Response) => this.handleError(error)));
   }
 
+  addFriend(friend: any) {
+    return this.http
+      .put(
+        this.url + '/addFriend',
+        { friend: friend },
+        {
+          headers: {
+            ['x-auth-token']: localStorage.getItem('authToken') || '',
+          },
+        }
+      )
+      .pipe(catchError((error: Response) => this.handleError(error)));
+  }
+
+  cancelFriend(friend: any) {
+    return this.http
+      .put(
+        this.url + '/cancelRequest',
+        { friend: friend },
+        {
+          headers: {
+            ['x-auth-token']: localStorage.getItem('authToken') || '',
+          },
+        }
+      )
+      .pipe(catchError((error: Response) => this.handleError(error)));
+  }
+
   private handleError(error: Response) {
     if (error.status === 404) return throwError(new NotFoundError(error));
     if (error.status === 400) return throwError(new BadInput(error));
     if (error.status === 409) return throwError(new AlreadyExistsError(error));
+    if (error.status === 401) return throwError(new UnauthorisedError(error));
 
     return throwError(new AppError(error));
   }

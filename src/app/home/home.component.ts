@@ -5,6 +5,9 @@ import { PostsService } from '../services/posts.service';
 import { UserService } from '../services/user.service';
 import { AuthService } from '../shared/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { UnauthorisedError } from '../common/unauthorised-error';
+import { BadInput } from '../common/bad-input';
+import { NotFoundError } from '../common/not-found-error';
 
 @Component({
   selector: 'home',
@@ -28,9 +31,14 @@ export class HomeComponent implements OnInit {
     this.currentUser = this.auth.getDecodedAccessToken(
       localStorage.getItem('authToken') || ''
     );
-    this.postService.getAll().subscribe((response) => {
-      this.posts = response;
-    });
+    this.postService.getAll().subscribe(
+      (response) => {
+        this.posts = response;
+      },
+      (error) => {
+        this.handleError(error);
+      }
+    );
   }
   addNewPost(event: Event) {
     this.posts.unshift(event);
@@ -38,6 +46,29 @@ export class HomeComponent implements OnInit {
       progressBar: true,
       closeButton: true,
       onActivateTick: false,
+      timeOut: 500,
     });
+  }
+  handleError(error: any) {
+    if (
+      error instanceof UnauthorisedError ||
+      error instanceof BadInput ||
+      error instanceof NotFoundError
+    )
+      this.toastr.error(
+        error?.originalError?.error?.message || 'Not Found',
+        error?.originalError?.status,
+        {
+          progressBar: true,
+          closeButton: true,
+          timeOut: 500,
+        }
+      );
+    else
+      this.toastr.error('Something went wrong!', '500', {
+        progressBar: true,
+        closeButton: true,
+        timeOut: 500,
+      });
   }
 }
