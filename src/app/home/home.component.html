@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row">
-        <div class=" mt-2  shadow p-3 mb-2 bg-body rounded text-center" *ngIf="currentUser?._id">
+        <div class="col mt-0 shadow p-3 mb-2 bg-body rounded text-center" *ngIf="currentUser?._id">
             <div class="float-start offset-3">
 
                 <img [src]="imageUrl+currentUser?.file" class="img-responsive " style="width:100px;height: 100px;"
@@ -13,7 +13,7 @@
             </post-form>
 
         </div>
-        <div *ngIf="!currentUser?._id" class="alert alert-danger alert-dismissible fade show text-center">
+        <div *ngIf="!currentUser?._id" class="col mt-5 alert alert-danger alert-dismissible fade show text-center">
             <strong>Login to post</strong>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>

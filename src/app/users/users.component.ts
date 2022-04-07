@@ -32,10 +32,10 @@ export class UsersComponent implements OnInit {
   ) {
     this.imageUrl = environment.imageUrl;
     this.form = fb.group({
-      name: fb.control('', [Validators.required]),
+      name: fb.control('', [Validators.required, Validators.maxLength(30)]),
       email: fb.control(
         '',
-        [Validators.required, Validators.email]
+        [Validators.required, Validators.email, Validators.maxLength(40)]
         // [EmailValidators.shouldBeUnique]
       ),
       file: fb.control('', [Validators.required]),
@@ -73,7 +73,8 @@ export class UsersComponent implements OnInit {
     this.currentUser = this.auth.getDecodedAccessToken(
       localStorage.getItem('authToken') || ''
     );
-    this.socket.joinRoom(this.currentUser._id);
+    // this.socket.joinRoom(this.currentUser._id);
+    // console.log(this.socket);
 
     this.service.getAll().subscribe(
       (response) => {
@@ -158,7 +159,7 @@ export class UsersComponent implements OnInit {
     this.form.controls['fileSource'].setErrors();
   }
   updateUser() {
-    if (!this.form.valid || this.currentUser?._id) return;
+    if (!this.form.valid || !this.currentUser?._id) return;
 
     let formData = new FormData();
     formData.append('name', this.form.get('name').value);

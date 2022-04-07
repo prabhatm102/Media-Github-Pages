@@ -8,6 +8,8 @@
                     <input type="text" formControlName="name" name="name" id="name" class="form-control">
                     <div *ngIf="!name.valid && name.touched">
                         <div class="text-danger" *ngIf="name.errors?.['required']">Name is required</div>
+                        <div class="text-danger" *ngIf="name.errors?.['maxlength']">Name should be maximum
+                            {{name?.errors?.['maxlength']?.requiredLength}} characters</div>
 
                     </div>
 
@@ -28,6 +30,8 @@
                     <div *ngIf="!email.valid && email.touched">
                         <div class="text-danger" *ngIf="email.errors?.['required']">Email is required</div>
                         <div class="text-danger" *ngIf="email.errors?.['email']">Email is should be valid email</div>
+                        <div class="text-danger" *ngIf="email.errors?.['maxlength']">Email should be maximum
+                            {{email?.errors?.['maxlength']?.requiredLength}} characters</div>
 
 
                     </div>

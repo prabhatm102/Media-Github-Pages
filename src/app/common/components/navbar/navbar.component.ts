@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, SimpleChanges } from '@angular/core';
 import jwtDecode from 'jwt-decode';
+import { SocketService } from 'src/app/services/socket.service';
 import { environment } from 'src/environments/environment';
-import { AuthService } from '../shared/auth.service';
+import { AuthService } from '../../../shared/auth.service';
 
 @Component({
   selector: 'navbar',
@@ -11,7 +12,7 @@ import { AuthService } from '../shared/auth.service';
 export class NavbarComponent implements OnInit {
   imageUrl: string;
   currentUser: any;
-  constructor(public auth: AuthService) {
+  constructor(public auth: AuthService, private socket: SocketService) {
     this.imageUrl = environment.imageUrl;
   }
 
@@ -27,6 +28,7 @@ export class NavbarComponent implements OnInit {
       this.auth.getDecodedAccessToken(localStorage.getItem('authToken') || '')
     ) {
       this.currentUser = jwtDecode(localStorage.getItem('authToken') || '');
+      // this.socket.joinRoom(this.currentUser?._id);
     }
   }
 }

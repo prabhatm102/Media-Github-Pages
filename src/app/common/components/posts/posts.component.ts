@@ -90,6 +90,25 @@ export class PostsComponent implements OnInit {
     if (likes?.find((u: any) => u?._id === this.currentUser?._id)) return true;
     else return false;
   }
+
+  isFriendsLiked(likes: any) {
+    // console.log(likes);
+    let likedByFriends = likes?.filter((u: any) =>
+      u?.friends?.find((f: any) => f?.user === this.currentUser?._id)
+    );
+    // console.log(likedByFriends);
+    if (likedByFriends.length > 0) {
+      if (likedByFriends.length === 1) {
+        return [{ name: likedByFriends[0]?.name }];
+      } else
+        return [
+          { name: likedByFriends[0]?.name },
+          { name: likedByFriends[1]?.name },
+        ];
+    }
+
+    return [];
+  }
   toggleComments(post: any) {
     let index = this.posts.findIndex((p: any) => p._id === post._id);
     if (index !== -1) this.posts[index] = post;

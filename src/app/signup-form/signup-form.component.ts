@@ -6,6 +6,7 @@ import { EmailValidators } from './email.validators';
 import { UsernameValidators } from './username.validators';
 import { AlreadyExistsError } from '../common/already-exists-error';
 import { ToastrService } from 'ngx-toastr';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'signup-form',
@@ -18,13 +19,17 @@ export class SignupFormComponent implements OnInit {
     private service: UserService,
     private router: Router,
     private toastr: ToastrService
-  ) {
+  ) // private http: HttpClient
+  {
     this.form = new FormGroup({
-      name: new FormControl('', [Validators.required]),
+      name: new FormControl('', [
+        Validators.required,
+        Validators.maxLength(30),
+      ]),
       email: new FormControl(
         '',
-        [Validators.required, Validators.email],
-        [EmailValidators.shouldBeUnique]
+        [Validators.required, Validators.email, Validators.maxLength(40)]
+        // [new EmailValidators(this.http).shouldBeUnique]
       ),
       password: new FormControl('', [
         Validators.required,

@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row">
-        <div class="col-12  mt-5  shadow p-3 mb-5 bg-body rounded">
+        <div class="col-12  mt-5  shadow p-3 mb-5 bg-body rounded overflow-auto" *ngIf="users?.length>0">
             <table class="table table-hover table-borderless align-middle">
                 <thead>
                     <tr>
@@ -59,23 +59,27 @@
                         <td>
                             <button type="button" (click)="selectUser(user)"
                                 *ngIf="(currentUser?.isAdmin && !user.isAdmin)|| user?._id===currentUser._id"
-                                class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                class="btn btn-sm btn-outline-primary m-1" data-bs-toggle="modal"
                                 data-bs-target="#updateModal" [attr.data-bs-whatever]="user"><i
                                     class="bi bi-pencil-square"></i></button>
 
 
-                            <button class="btn btn-sm btn-outline-danger mx-4"
+                            <button class="btn btn-sm btn-outline-danger m-1"
                                 *ngIf="(currentUser?.isAdmin && !user.isAdmin)  || user?._id===currentUser._id"
                                 (click)="deleteUser(user)">
                                 <i class="bi bi-trash"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" (click)="viewUser(user)">
+                            <button class="btn btn-sm btn-outline-primary m-1" (click)="    viewUser(user)">
                                 <i class="bi bi-info-circle-fill"></i>
                             </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div *ngIf="users?.length===0" class=" col mt-5 alert alert-danger alert-dismissible fade show text-center">
+            <strong>There is no users are available.</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
 </div>
@@ -97,7 +101,8 @@
                             [value]="name.value">
                         <div *ngIf="!name.valid && name.touched">
                             <div class="text-danger" *ngIf="name.errors?.['required']">Name is required</div>
-
+                            <div class="text-danger" *ngIf="name.errors?.['maxlength']">Name should be maximum
+                                {{name?.errors?.['maxlength']?.requiredLength}} characters</div>
                         </div>
 
                     </div>
@@ -117,6 +122,9 @@
                             <div class="text-danger" *ngIf="email.errors?.['required']">Email is required</div>
                             <div class="text-danger" *ngIf="email.errors?.['email']">Email is should be valid email
                             </div>
+                            <div class="text-danger" *ngIf="email.errors?.['maxlength']">Email should be maximum
+                                {{email?.errors?.['maxlength']?.requiredLength}} characters</div>
+
 
 
                         </div>

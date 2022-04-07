@@ -1,5 +1,6 @@
 <div class="conatiner">
-    <div class="row" class="overflow-auto d-inline-block w-100 comments-bar" style="max-height:250px;">
+    <div class="row" class="overflow-auto d-inline-block w-100 comments-bar" style="max-height:250px;"
+        #commentsContainer>
         <div class="col" *ngIf="comments?.length>0">
             <div class="comments" *ngFor="let comment of comments">
                 <div class="mb-4">
@@ -36,7 +37,8 @@
     </div>
     <div class="row">
         <div class="col">
-            <comment-form [user]="user" [post]="post" (newCommentEvent)="addNewComment($event)"></comment-form>
+            <comment-form [user]="user" [post]="post" (newCommentEvent)="addNewComment($event,commentsContainer)">
+            </comment-form>
         </div>
     </div>
 </div>

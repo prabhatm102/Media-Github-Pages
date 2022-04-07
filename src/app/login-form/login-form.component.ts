@@ -19,7 +19,11 @@ export class LoginFormComponent implements OnInit {
     private toastr: ToastrService
   ) {
     this.form = new FormGroup({
-      email: new FormControl('', [Validators.required, Validators.email]),
+      email: new FormControl('', [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(40),
+      ]),
       password: new FormControl('', [
         Validators.required,
         Validators.minLength(8),

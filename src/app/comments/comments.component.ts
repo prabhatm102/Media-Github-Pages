@@ -33,8 +33,13 @@ export class CommentsComponent implements OnInit {
     );
   }
 
-  addNewComment(comment: any) {
-    this.comments.unshift(comment);
+  addNewComment(comment: any, el: HTMLElement) {
+    this.comments.push(comment);
+    el.scroll({
+      top: el.scrollHeight,
+      left: el.scrollWidth,
+      behavior: 'smooth',
+    });
   }
 
   handleError(error: any) {

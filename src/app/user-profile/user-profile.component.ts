@@ -37,7 +37,7 @@ export class UserProfileComponent implements OnInit {
       localStorage.getItem('authToken') || ''
     );
 
-    this.socket.joinRoom(this.currentUser?._id);
+    // this.socket.joinRoom(this.currentUser?._id);
 
     this.route.paramMap.subscribe(
       (params) => {
