@@ -3,4 +3,4 @@
 <signup-form *ngIf="selectedNav?.id === 2"> </signup-form> -->
 
 <navbar></navbar>
-<router-outlet></router-outlet>
+<router-outlet (activate)="onActivate($event)"></router-outlet>
