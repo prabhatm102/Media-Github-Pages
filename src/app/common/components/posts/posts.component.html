@@ -15,7 +15,8 @@
                                     class="text-dark text-decoration-none">
 
                                     <img [src]="imageUrl+post?.user?.file" class="img-responsive rounded-circle"
-                                        style="width:35px;height: 35px;" />
+                                        style="width:35px;height: 35px;"
+                                        onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'" />
                                 </a>
                             </div>
                             <div class="post-user-name ">
@@ -37,7 +38,8 @@
                         </div>
                         <div class="post-image" *ngIf="post?.postFile">
                             <img [src]="postImageUrl+post?.postFile" class="img-fluid "
-                                style="width:100%;height: inherit" />
+                                style="width:100%;height: inherit"
+                                onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'" />
                         </div>
                         <div class="post-like-count mt-2" *ngIf="post?.likes?.length>0">
                             <span class="text-primary fs-5 clickable" (click)="toggleLikedBy(post)"
@@ -90,7 +92,8 @@
                                         <div>
 
                                             <img [src]="imageUrl+user?.file" style="width:75px;height: 75px;"
-                                                class="rounded-circle card-img-top img-responsive" alt="...">
+                                                class="rounded-circle card-img-top img-responsive"
+                                                onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'">
 
                                             <div class="card-body  ">
                                                 <strong class="card-title text-truncate d-inline-block"
@@ -101,9 +104,6 @@
 
                                 </div>
                             </div>
-                            <div *ngIf="likedBy?.length ===0" class="mb-2">
-                                You don't have Add from <a [routerLink]="['../../']">here</a>. </div>
-
                         </div>
                     </div>
                 </div>
@@ -144,7 +144,8 @@
                                 <div class="text-center m-2"
                                     *ngIf="(selectedPost?.postFile || localPostImageUrl) && (postFile.value || localPostImageUrl)">
                                     <img [src]="(localPostImageUrl ) || (selectedPostImageUrl+selectedPost?.postFile) | sanitizerUrl"
-                                        alt="..." class="img-fluid img-thumbnail rounded h-50 w-50" />
+                                        onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'"
+                                        class="img-fluid img-thumbnail rounded h-50 w-50" />
 
                                 </div>
                                 <div class="text-center m-2 h-50 w-50"

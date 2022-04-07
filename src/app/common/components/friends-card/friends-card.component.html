@@ -10,7 +10,8 @@
                         <div>
 
                             <img [src]="imageUrl+friend?.user?.file" style="width:75px;height: 75px;"
-                                class="rounded-circle card-img-top img-responsive" alt="...">
+                                class="rounded-circle card-img-top img-responsive" alt="..."
+                                onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'">
 
                             <div class="card-body  ">
                                 <strong class="card-title text-truncate d-inline-block"

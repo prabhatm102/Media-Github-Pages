@@ -19,7 +19,8 @@
                             <a [routerLink]="['profile',user?._id]" data-bs-toggle="tooltip" data-bs-placement="bottom"
                                 [title]="'View '+user.name + 's Profile'">
 
-                                <img [src]="imageUrl+user.file" class="img-fluid" style="width:30px;height: 30px;">
+                                <img [src]="imageUrl+user.file" class="img-fluid" style="width:30px;height: 30px;"
+                                    onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'">
                             </a>
                         </td>
                         <td>{{ user.name }}</td>
@@ -129,7 +130,8 @@
                                 <div class="text-center m-2"
                                     *ngIf="selectedUser?.file && (file.value || localImageUrl)">
                                     <img [src]="(localImageUrl ) || (imageUrl+selectedUser?.file) | sanitizerUrl"
-                                        alt="..." class="img-fluid img-thumbnail rounded h-50 w-50" />
+                                        onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'"
+                                        class="img-fluid img-thumbnail rounded h-50 w-50" />
                                 </div>
                             </span>
                             <input type="file" style="display:none" class="form-control" name="file"
