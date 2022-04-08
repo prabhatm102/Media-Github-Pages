@@ -17,6 +17,7 @@ export class CommentsComponent implements OnInit {
   @Input('post') post: any;
   imageUrl: string;
   comments: any = [];
+  showLoader: boolean = true;
 
   constructor(private service: CommentService, private toastr: ToastrService) {
     this.imageUrl = environment.imageUrl;
@@ -25,9 +26,11 @@ export class CommentsComponent implements OnInit {
   ngOnInit(): void {
     this.service.getById(this.post?._id).subscribe(
       (response) => {
+        this.showLoader = false;
         this.comments = response;
       },
       (error) => {
+        this.showLoader = false;
         this.handleError(error);
       }
     );

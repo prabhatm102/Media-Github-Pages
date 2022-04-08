@@ -4,10 +4,14 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://192.168.1.35:5000/api/',
-  socketUrl: 'http://192.168.1.35:5000/',
-  imageUrl: 'http://192.168.1.35:5000/uploads/',
-  postImageUrl: 'http://192.168.1.35:5000/posts/',
+  // apiUrl: 'http://192.168.1.35:5000/api/',
+  // socketUrl: 'http://192.168.1.35:5000/',
+  // imageUrl: 'http://192.168.1.35:5000/uploads/',
+  // postImageUrl: 'http://192.168.1.35:5000/posts/',
+  apiUrl: 'https://media-2.herokuapp.com/api/',
+  socketUrl: 'https://media-2.herokuapp.com/',
+  imageUrl: 'https://media-2.herokuapp.com/uploads/',
+  postImageUrl: 'https://media-2.herokuapp.com/posts/',
 };
 
 /*

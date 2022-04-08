@@ -15,6 +15,7 @@ import { PostsService } from '../services/posts.service';
 export class DummyPostsComponent implements OnInit {
   form: any;
   posts: any = [];
+  showLoader: boolean = true;
 
   constructor(private service: JsonPostService, fb: FormBuilder) {
     this.form = fb.group({
@@ -25,9 +26,11 @@ export class DummyPostsComponent implements OnInit {
   ngOnInit(): void {
     this.service.getAll().subscribe(
       (response) => {
+        this.showLoader = false;
         this.posts = response;
       },
       (error: AppError) => {
+        this.showLoader = false;
         throw error;
       }
     );

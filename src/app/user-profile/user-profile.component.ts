@@ -20,6 +20,7 @@ export class UserProfileComponent implements OnInit {
   imageUrl: string;
   currentUser: any;
   posts: any;
+  showLoader: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -58,9 +59,11 @@ export class UserProfileComponent implements OnInit {
 
         this.postService.getByUserId(id).subscribe(
           (response) => {
+            this.showLoader = false;
             this.posts = response;
           },
           (error) => {
+            this.showLoader = false;
             this.handleError(error);
           }
         );

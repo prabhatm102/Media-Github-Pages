@@ -18,6 +18,7 @@ export class HomeComponent implements OnInit {
   imageUrl: string;
   currentUser: any;
   posts: any;
+  showLoader: boolean = true;
 
   constructor(
     private auth: AuthService,
@@ -33,9 +34,11 @@ export class HomeComponent implements OnInit {
     );
     this.postService.getAll().subscribe(
       (response) => {
+        this.showLoader = false;
         this.posts = response;
       },
       (error) => {
+        this.showLoader = false;
         this.handleError(error);
       }
     );

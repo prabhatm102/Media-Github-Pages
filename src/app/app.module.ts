@@ -39,6 +39,8 @@ import { ClipboardModule } from 'ngx-clipboard';
 import { ToastrModule } from 'ngx-toastr';
 import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 import { environment } from 'src/environments/environment';
+import { NgxPaginationModule } from 'ngx-pagination';
+
 // import { QuillModule } from 'ngx-quill';
 
 const config: SocketIoConfig = {
@@ -93,6 +95,7 @@ const config: SocketIoConfig = {
     BrowserAnimationsModule,
     SocketIoModule.forRoot(config),
     // QuillModule,
+    NgxPaginationModule,
   ],
   providers: [
     AuthService,

@@ -1,81 +1,107 @@
-<div class="container">
+<div class="container" *ngIf="showLoader">
     <div class="row">
-        <div class="col-12  mt-5  shadow p-3 mb-5 bg-body rounded overflow-auto" *ngIf="users?.length>0">
-            <table class="table table-hover table-borderless align-middle">
-                <thead>
-                    <tr>
-                        <th scope="col">Avatar</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Active</th>
-                        <th scope="col">Role</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let user of users">
-                        <td>
-                            <a [routerLink]="['profile',user?._id]" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                [title]="'View '+user.name + 's Profile'">
+        <div class="col text-center mt-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container" *ngIf="!showLoader">
+    <div class="row">
+        <div class="row">
+            <div class="col mt-5">
+                <div class="text-end">
+                    <!-- showing page {{page}} out of {{(users?.length)/itemsPerPage | number:'1.0-0'}} -->
+                    <pagination-controls #u (pageChange)="pageChanged($event)" id="users_pagination"
+                        previousLabel="Previous" [maxSize]="7" [directionLinks]="true" [responsive]="false"
+                        nextLabel="Next" screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
+                        screenReaderCurrentLabel="You're on page">>
+                    </pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="col-12  mt-1  shadow p-3 mb-5 bg-body rounded overflow-auto" *ngIf="users?.length>0">
+            <div style="min-height:280px">
+                <table class="table table-hover table-borderless align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Avatar</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Active</th>
+                            <th scope="col">Role</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            *ngFor="let user of users | paginate:{id:'users_pagination',itemsPerPage,currentPage:page,totalItems:users?.length}">
+                            <td>
+                                <a [routerLink]="['profile',user?._id]" data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom" [title]="'View '+user.name + 's Profile'">
 
-                                <img [src]="imageUrl+user.file" class="img-fluid" style="width:30px;height: 30px;"
-                                    onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'">
-                            </a>
-                        </td>
-                        <td>{{ user.name }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>
-                            <span class="badge rounded-pill"
-                                [ngClass]="user.isActive?'alert-success':'alert-danger'">{{user.isActive?'Active':'Deactive'}}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge rounded-pill"
-                                [ngClass]="user.isAdmin?'alert-success':'alert-danger'">{{user.isAdmin?'Admin':'User'}}
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <div *ngIf="user?._id!==currentUser?._id">
-                                <button class="btn btn-sm " (click)="handleFriendRequest(user)" [ngClass]="
-                                {
-                                    'btn-outline-danger':user.status==='Remove Friend','btn-outline-primary':user.status==='Send Request','btn-outline-secondary':user.status==='Cancel Request','btn-outline-success':user.status==='sent'
-                                }">
-                                    <i class="bi " [ngClass]="
+                                    <img [src]="imageUrl+user.file" class="img-fluid" style="width:30px;height: 30px;"
+                                        onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'">
+                                </a>
+                            </td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="badge rounded-pill"
+                                    [ngClass]="user.isActive?'alert-success':'alert-danger'">{{user.isActive?'Active':'Deactive'}}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill"
+                                    [ngClass]="user.isAdmin?'alert-success':'alert-danger'">{{user.isAdmin?'Admin':'User'}}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div *ngIf="user?._id!==currentUser?._id">
+                                    <button class="btn btn-sm " (click)="handleFriendRequest(user)" [ngClass]="
                                     {
-                                    'bi-dash-circle-fill':user.status==='Remove Friend','bi-person-plus-fill':user.status==='Send Request','bi-x-circle-fill':user.status==='Cancel Request','bi-check-circle':user.status==='sent'
-                                }
-                                    "></i>
-                                    <span class="mx-1">{{user.status==="sent"?'Accept':user.status}}</span>
+                                        'btn-outline-danger':user.status==='Remove Friend','btn-outline-primary':user.status==='Send Request','btn-outline-secondary':user.status==='Cancel Request','btn-outline-success':user.status==='sent'
+                                    }">
+                                        <i class="bi " [ngClass]="
+                                        {
+                                        'bi-dash-circle-fill':user.status==='Remove Friend','bi-person-plus-fill':user.status==='Send Request','bi-x-circle-fill':user.status==='Cancel Request','bi-check-circle':user.status==='sent'
+                                    }
+                                        "></i>
+                                        <span class="mx-1">{{user.status==="sent"?'Accept':user.status}}</span>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary mx-2" *ngIf="user.status==='sent'"
+                                        (click)="handleFriendRequest(user,'cancel')">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                        <span class="mx-1">Cancel</span>
+                                    </button>
+                                </div>
+
+                            </td>
+                            <td>
+                                <button type="button" (click)="selectUser(user)"
+                                    *ngIf="(currentUser?.isAdmin && !user.isAdmin)|| user?._id===currentUser._id"
+                                    class="btn btn-sm btn-outline-primary m-1" data-bs-toggle="modal"
+                                    data-bs-target="#updateModal" [attr.data-bs-whatever]="user"><i
+                                        class="bi bi-pencil-square"></i></button>
+
+
+                                <button class="btn btn-sm btn-outline-danger m-1"
+                                    *ngIf="(currentUser?.isAdmin && !user.isAdmin)  || user?._id===currentUser._id"
+                                    (click)="deleteUser(user)">
+                                    <i class="bi bi-trash"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-secondary mx-2" *ngIf="user.status==='sent'"
-                                    (click)="handleFriendRequest(user,'cancel')">
-                                    <i class="bi bi-x-circle-fill"></i>
-                                    <span class="mx-1">Cancel</span>
+                                <button class="btn btn-sm btn-outline-primary m-1" (click)="    viewUser(user)">
+                                    <i class="bi bi-info-circle-fill"></i>
                                 </button>
-                            </div>
+                            </td>
+                        </tr>
 
-                        </td>
-                        <td>
-                            <button type="button" (click)="selectUser(user)"
-                                *ngIf="(currentUser?.isAdmin && !user.isAdmin)|| user?._id===currentUser._id"
-                                class="btn btn-sm btn-outline-primary m-1" data-bs-toggle="modal"
-                                data-bs-target="#updateModal" [attr.data-bs-whatever]="user"><i
-                                    class="bi bi-pencil-square"></i></button>
+                    </tbody>
 
-
-                            <button class="btn btn-sm btn-outline-danger m-1"
-                                *ngIf="(currentUser?.isAdmin && !user.isAdmin)  || user?._id===currentUser._id"
-                                (click)="deleteUser(user)">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary m-1" (click)="    viewUser(user)">
-                                <i class="bi bi-info-circle-fill"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                </table>
+            </div>
         </div>
         <div *ngIf="users?.length===0" class=" col mt-5 alert alert-danger alert-dismissible fade show text-center">
             <strong>There is no users are available.</strong>

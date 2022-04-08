@@ -22,6 +22,9 @@ export class UsersComponent implements OnInit {
   selectedUser: any;
   imageUrl: string = '';
   localImageUrl: string = '';
+  showLoader: boolean = true;
+  page: number = 1;
+  itemsPerPage: number = 3;
 
   constructor(
     private service: UserService,
@@ -78,9 +81,11 @@ export class UsersComponent implements OnInit {
 
     this.service.getAll().subscribe(
       (response) => {
+        this.showLoader = false;
         this.users = this.friendStatus(response);
       },
       (error) => {
+        this.showLoader = false;
         this.handleError(error);
       }
     );
@@ -320,5 +325,9 @@ export class UsersComponent implements OnInit {
         closeButton: true,
         timeOut: 500,
       });
+  }
+
+  pageChanged(event: any) {
+    this.page = event;
   }
 }
