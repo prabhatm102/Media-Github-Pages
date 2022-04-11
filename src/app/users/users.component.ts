@@ -173,8 +173,9 @@ export class UsersComponent implements OnInit {
     if (this.form.get('fileSource').value)
       formData.append('file', this.form.get('fileSource').value);
     if (
-      this.currentUser.isAdmin &&
-      this.currentUser === this.selectedUser._id
+      this.currentUser.isAdmin
+      // &&
+      // this.currentUser === this.selectedUser._id
     ) {
       formData.append('isActive', this.form.get('isActive').value);
       formData.append('isAdmin', this.form.get('isAdmin').value);
