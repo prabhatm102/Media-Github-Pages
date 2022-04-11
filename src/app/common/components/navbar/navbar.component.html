@@ -30,7 +30,7 @@
                 <li class="nav-item dropdown" *ngIf="auth.isLoggedIn()">
                     <a class="nav-link dropdown-toggle" href="#" id="myprofile" role="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        <div>
+                        <div class="float-start text-center text-primary">
                             <img [src]="imageUrl+currentUser?.file" class="img-responsive"
                                 style="width:30px;height: 30px;"
                                 onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'">

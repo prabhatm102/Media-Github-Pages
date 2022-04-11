@@ -33,7 +33,7 @@
 
                 <div *ngIf="localPostImageUrl">
                     <span>
-                        <div class="text-center m-2">
+                        <div class="text-center m-2 text-primary">
                             <img [src]="localPostImageUrl | sanitizerUrl" alt="..."
                                 class="img-fluid img-thumbnail rounded h-25 w-25"
                                 onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'" />

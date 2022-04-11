@@ -37,7 +37,7 @@
                         <div class="post-caption  p-2" [innerHTML]="post?.message">
 
                         </div>
-                        <div class="post-image" *ngIf="post?.postFile">
+                        <div class="post-image text-center text-primary" *ngIf="post?.postFile">
                             <img [src]="postImageUrl+post?.postFile" class="img-fluid "
                                 style="width:100%;height: inherit"
                                 onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'" />
@@ -114,8 +114,7 @@
                                         data-bs-toggle="tooltip" data-bs-dismiss="modal" data-bs-placement="bottom"
                                         [title]="'View '+user?.name + ' Profile'">
                                         <div>
-                                            <div>
-
+                                            <div class="text-center text-primary" style="min-height: 75px;">
                                                 <img [src]="imageUrl+user?.file" style="width:75px;height: 75px;"
                                                     class="rounded-circle card-img-top img-responsive"
                                                     onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'">
@@ -167,7 +166,7 @@
                         <label for="file" class="form-label">Image</label>
                         <label class="btn">
                             <span>
-                                <div class="text-center m-2"
+                                <div class="text-center m-2 text-primary" ng-
                                     *ngIf="(selectedPost?.postFile || localPostImageUrl) && (postFile.value || localPostImageUrl)">
                                     <img [src]="(localPostImageUrl ) || (selectedPostImageUrl+selectedPost?.postFile) | sanitizerUrl"
                                         onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'"

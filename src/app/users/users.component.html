@@ -161,7 +161,7 @@
                         <label for="file" class="form-label">Avatar<span class="required">*</span></label>
                         <label class="btn">
                             <span>
-                                <div class="text-center m-2"
+                                <div class="text-center m-2 text-primary"
                                     *ngIf="selectedUser?.file && (file.value || localImageUrl)">
                                     <img [src]="(localImageUrl ) || (imageUrl+selectedUser?.file) | sanitizerUrl"
                                         onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'"

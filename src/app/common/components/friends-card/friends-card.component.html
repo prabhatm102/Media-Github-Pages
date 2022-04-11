@@ -8,7 +8,7 @@
                     <a class="text-dark" [routerLink]="['../',friend?.user?._id]" data-bs-toggle="tooltip"
                         data-bs-placement="bottom" [title]="'View '+friend?.user?.name + ' Profile'">
                         <div>
-                            <div>
+                            <div style="min-height:75px ;" class="text-center text-primary">
                                 <img [src]="imageUrl+friend?.user?.file" style="width:75px;height: 75px;"
                                     class="rounded-circle card-img-top img-responsive" alt="..."
                                     onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'">

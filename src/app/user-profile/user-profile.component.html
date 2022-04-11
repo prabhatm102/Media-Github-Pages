@@ -11,7 +11,7 @@
 <div class="container" *ngIf="!showLoader">
     <div class="row">
         <div class=" mt-2 shadow p-3 mb-2 bg-body rounded text-center" *ngIf="user?._id">
-            <div>
+            <div class="text-center text-primary">
 
                 <img [src]="imageUrl+user?.file" class="img-responsive " style="width:100px;height: 100px;"
                     *ngIf="user?.file" onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'" />
