@@ -93,6 +93,12 @@ export class PostFormComponent implements OnInit {
     }
   }
 
+  deletePostImage(){
+     this.localPostImageUrl = '';
+     this.form.controls['postFile'].setValue('');
+     this.form.controls['fileSource'].setValue('');
+  }
+
   handleError(error: any) {
     if (
       error instanceof UnauthorisedError ||

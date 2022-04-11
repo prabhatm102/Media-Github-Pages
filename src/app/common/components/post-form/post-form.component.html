@@ -24,7 +24,8 @@
                             </div>
                         </label>
                     </span>
-                    <button type="submit" class="btn btn-primary mx-2" [disabled]="!form.valid"><i
+                    <button type="submit" class="btn btn-primary mx-2"
+                        [disabled]="!form.valid || (!message.value && !postFile.value)"><i
                             class="bi bi-send-fill"></i></button>
                 </div>
 
@@ -36,6 +37,7 @@
                             <img [src]="localPostImageUrl | sanitizerUrl" alt="..."
                                 class="img-fluid img-thumbnail rounded h-25 w-25"
                                 onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'" />
+                            <i class="bi bi-x-circle-fill mx-2 clickable" (click)="deletePostImage()"></i>
                         </div>
                     </span>
                 </div>

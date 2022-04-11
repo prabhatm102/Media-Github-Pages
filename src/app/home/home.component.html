@@ -12,9 +12,11 @@
     <div class="row">
         <div class="col mt-0 shadow p-3 mb-2 bg-body rounded text-center" *ngIf="currentUser?._id">
             <div class="float-start offset-3">
+                <div>
 
-                <img [src]="imageUrl+currentUser?.file" class="img-responsive " style="width:100px;height: 100px;"
-                    *ngIf="currentUser?.file" onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'" />
+                    <img [src]="imageUrl+currentUser?.file" class="img-responsive " style="width:100px;height: 100px;"
+                        *ngIf="currentUser?.file" onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'" />
+                </div>
 
                 <h2 class="text-center">{{currentUser?.name}}</h2>
             </div>
