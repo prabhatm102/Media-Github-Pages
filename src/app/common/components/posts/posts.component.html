@@ -1,8 +1,27 @@
 <div class="container mb-3">
     <div class="row">
+        <div class="text-end">
+
+            <pagination-controls class="float-end" #u (pageChange)="pageChanged($event)" id="postPagination"
+                previousLabel="Previous" [maxSize]="7" [directionLinks]="true" [responsive]="false" nextLabel="Next"
+                screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
+                screenReaderCurrentLabel="You're on page">>
+            </pagination-controls>
+            <!-- <div class="float-end">
+                <input type="search" class="text-center" name="search" id="search" placeholder="Search..." #search
+                    (keyup)="searchPost(search)" (search)="searchPost(search)" />
+            </div> -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="text-center" *ngIf="posts?.length===0">
+            There is no post available.
+        </div>
+    </div>
+    <div class="row">
         <div *ngIf="posts?.length>0">
             <div class="m-auto offset-lg-3 col-sm-12 mt-2 shadow mb-0 bg-body rounded " style="max-width: 350px;"
-                *ngFor="let post of posts">
+                *ngFor="let post of posts | paginate:{id:'postPagination',itemsPerPage,currentPage,totalItems:posts?.length}">
                 <div class="post">
                     <div class="post-header p-3">
                         <div class="post-action float-end" *ngIf="post?.user?._id===currentUser?._id">
@@ -27,20 +46,20 @@
                                 </a>
                             </div>
 
-                            <div class="post-timestamp mb-3">
+                            <div class="post-timestamp mb-1">
                                 <p class="text-muted fs-6">{{post?.updatedAt | date:'short'}}</p>
                             </div>
                         </div>
 
                     </div>
                     <div class="post-body">
-                        <div class="post-caption  p-2" [innerHTML]="post?.message">
+                        <div class="post-caption  p-2 mt-0" [innerHTML]="post?.message">
 
                         </div>
                         <div class="post-image text-center text-primary" *ngIf="post?.postFile">
-                            <img [src]="postImageUrl+post?.postFile" class="img-fluid "
-                                style="width:100%;height: inherit"
-                                onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'" />
+                            <img [src]="( post?.postFile==='temp' && tempPostUrl ) || (postImageUrl+post?.postFile) | sanitizerUrl"
+                                onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'" class="img-fluid "
+                                style="width:100%;height: inherit" />
                         </div>
                         <div class="post-like-count mt-2" *ngIf="post?.likes?.length>0">
                             <span class="text-primary fs-5 clickable" (click)="toggleLikedBy(post)"
@@ -48,7 +67,8 @@
                                 <i class="bi bi-hand-thumbs-up-fill"></i>
 
                                 <span *ngIf="!isLiked(post?.likes)" class="text-muted fs-6">
-                                    <span *ngIf="isFriendsLiked(post.likes).length<=0">
+                                    {{ post?.likes?.length}}
+                                    <!-- <span *ngIf="isFriendsLiked(post.likes).length<=0">
                                         {{post?.likes?.length}}
                                     </span>
                                     <span *ngIf="isFriendsLiked(post.likes).length>=0">
@@ -57,7 +77,7 @@
                                             {{item.name}}
                                             <span *ngIf="i==1">,</span>
                                         </span>
-                                    </span>
+                                    </span> -->
 
 
                                 </span>
@@ -169,9 +189,11 @@
                                 <div class="text-center m-2 text-primary" ng-
                                     *ngIf="(selectedPost?.postFile || localPostImageUrl) && (postFile.value || localPostImageUrl)">
                                     <img [src]="(localPostImageUrl ) || (selectedPostImageUrl+selectedPost?.postFile) | sanitizerUrl"
-                                        onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'"
-                                        class="img-fluid img-thumbnail rounded h-50 w-50" />
-
+                                        onload="this.style='display:block;'"
+                                        onerror="this.style='display:none';this.width=0"
+                                        class="img-fluid img-thumbnail rounded h-50 w-50" #postImg />
+                                    <i class=bi-image-alt
+                                        *ngIf="postImg.width<=0 && !postImg.src.startsWith('blob')"></i>
                                 </div>
                                 <div class="text-center m-2 h-50 w-50"
                                     *ngIf="!selectedPost?.postFile && (!postFile.value || !localPostImageUrl)">

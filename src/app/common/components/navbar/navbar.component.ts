@@ -12,7 +12,10 @@ import { AuthService } from '../../../shared/auth.service';
 export class NavbarComponent implements OnInit {
   imageUrl: string;
   currentUser: any;
+  navBarBackground: string;
   constructor(public auth: AuthService, private socket: SocketService) {
+    this.navBarBackground = environment.navBarBackground;
+    console.log(this.navBarBackground);
     this.imageUrl = environment.imageUrl;
   }
 

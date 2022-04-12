@@ -3,8 +3,10 @@
         <div class="col-6 mx-3 shadow p-3 mb-5 bg-body rounded">
             <form [formGroup]="form" (ngSubmit)="post()">
                 <div class="input-group mb-3">
-                    <input type="text" formControlName="message" name="message" id="message" class="form-control"
-                        placeholder="Post something.....">
+                    <!-- <input type="text" formControlName="message" name="message" id="message" class="form-control"
+                        placeholder="Post something....."> -->
+                    <textarea formControlName="message" name="message" id="message" class="form-control"
+                        placeholder="Post something....." style="resize: none"></textarea>
                     <div *ngIf="!message.valid && message.touched">
                         <div class="text-danger" *ngIf="message.errors?.['required']">message is required</div>
 

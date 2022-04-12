@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -8,11 +8,18 @@ import { NotFoundError } from '../common/not-found-error';
 import { AuthService } from '../shared/auth.service';
 import { AlreadyExistsError } from '../common/already-exists-error';
 import { UnauthorisedError } from '../common/unauthorised-error';
+import {
+  ActivatedRouteSnapshot,
+  Resolve,
+  RouterStateSnapshot,
+} from '@angular/router';
 
 // @Injectable({
 //   providedIn: 'root'
 // })
-export class DataService {
+
+export interface data {}
+export class DataService implements Resolve<data> {
   //   private url="https://jsonplaceholder.typicode.com/posts";
 
   constructor(
@@ -21,12 +28,29 @@ export class DataService {
     private authService?: AuthService
   ) {}
 
-  getAll() {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+    return this.http
+      .get(this.url + '/' + route.paramMap.get('id'), {
+        headers: { ['x-auth-token']: localStorage.getItem('authToken') || '' },
+      })
+      .pipe(
+        catchError((error: Response) => {
+          return this.handleError(error);
+        })
+      );
+  }
+
+  getAll(searchQuery?: any) {
+    if (!searchQuery) {
+      searchQuery = '';
+    }
+    const params = new HttpParams().set('searchQuery', searchQuery);
     return this.http
       .get(this.url, {
         headers: {
           ['x-auth-token']: localStorage.getItem('authToken') || '',
         },
+        params,
       })
       .pipe(catchError((error: Response) => this.handleError(error)));
   }
@@ -61,7 +85,8 @@ export class DataService {
       .post(this.url + '/' + id, resource, {
         headers: { ['x-auth-token']: localStorage.getItem('authToken') || '' },
       })
-      .pipe(catchError((error: Response) => this.handleError(error)));
+      .pipe(catchError((error: Response) => this.handleError(error)))
+      .toPromise();
   }
 
   likePost(postId: string) {

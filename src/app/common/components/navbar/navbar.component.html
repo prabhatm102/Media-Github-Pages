@@ -1,6 +1,8 @@
-<nav class="navbar navbar-expand-lg navbar-light shadow p-3 rounded sticky-top" style="background-color: #e3f2fd;">
+<nav class="navbar navbar-expand-lg navbar-light shadow p-3 rounded sticky-top"
+    [style.backgroundColor]="navBarBackground">
     <div class="container-fluid">
-        <a class="navbar-brand" routerLink="/">Navbar</a>
+        <a routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="navbar-brand"
+            routerLink="/">Navbar</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#media-navbar"
             aria-controls="media-navbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -8,27 +10,32 @@
         <div class="collapse navbar-collapse" id="media-navbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="">Home</a>
+                    <a routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-link"
+                        routerLink="">Home</a>
                 </li>
                 <li class="nav-item" *ngIf="auth.isLoggedIn()">
-                    <a class="nav-link" routerLink="users">Users</a>
+                    <a routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-link"
+                        routerLink="users">Users</a>
                 </li>
                 <!-- <li class="nav-item" *ngIf="auth.isLoggedIn()">
-                    <a class="nav-link" routerLink="posts">Posts</a>
+                    <a routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-link" routerLink="posts">Posts</a>
                 </li> -->
                 <li class="nav-item float-end">
 
                 </li>
                 <li class="nav-item" *ngIf="!auth.isLoggedIn()">
-                    <a class="nav-link" routerLink="users/signup">Sign Up</a>
+                    <a routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-link"
+                        routerLink="users/signup">Sign Up</a>
                 </li>
                 <li class="nav-item" *ngIf="!auth.isLoggedIn()">
-                    <a class="nav-link" routerLink="users/login">Sign In</a>
+                    <a routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-link"
+                        routerLink="users/login">Sign In</a>
                 </li>
             </ul>
             <ul class="navbar-nav me-5 mb-2 mb-lg-0 float-end">
                 <li class="nav-item dropdown" *ngIf="auth.isLoggedIn()">
-                    <a class="nav-link dropdown-toggle" href="#" id="myprofile" role="button" data-bs-toggle="dropdown"
+                    <a routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}"
+                        class="nav-link dropdown-toggle" href="#" id="myprofile" role="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         <div class="float-start text-center text-primary me-2">
                             <img [src]="imageUrl+currentUser?.file" class="img-responsive"

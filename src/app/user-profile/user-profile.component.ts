@@ -38,26 +38,19 @@ export class UserProfileComponent implements OnInit {
       localStorage.getItem('authToken') || ''
     );
 
-    // this.socket.joinRoom(this.currentUser?._id);
+    this.route.data.subscribe(
+      (response) => {
+        this.user = response['userData'];
+        // console.log(this.route.snapshot.params['id']);
+        // console.log(this.route.snapshot.paramMap.get('id'));
 
-    this.route.paramMap.subscribe(
-      (params) => {
-        let id = params.get('id');
-        this.service.getById(id).subscribe(
-          (response) => {
-            this.user = response;
+        // this.route.paramMap.subscribe((param) => console.log(param));
 
-            // let friend = this.user?.friends.find(
-            //   (f: any) => f?.user?._id === this.currentUser?._id
-            // );
-            this.friendStatus();
-          },
-          (error) => {
-            this.handleError(error);
-          }
-        );
-
-        this.postService.getByUserId(id).subscribe(
+        // let friend = this.user?.friends.find(
+        //   (f: any) => f?.user?._id === this.currentUser?._id
+        // );
+        this.friendStatus();
+        this.postService.getByUserId(this.user?._id).subscribe(
           (response) => {
             this.showLoader = false;
             this.posts = response;
@@ -69,9 +62,45 @@ export class UserProfileComponent implements OnInit {
         );
       },
       (error) => {
+        this.showLoader = false;
         this.handleError(error);
       }
     );
+
+    // this.socket.joinRoom(this.currentUser?._id);
+
+    // this.route.paramMap.subscribe(
+    //   (params) => {
+    //     let id = params.get('id');
+    //     this.service.getById(id).subscribe(
+    //       (response) => {
+    //         this.user = response;
+
+    //         // let friend = this.user?.friends.find(
+    //         //   (f: any) => f?.user?._id === this.currentUser?._id
+    //         // );
+    //         this.friendStatus();
+    //       },
+    //       (error) => {
+    //         this.handleError(error);
+    //       }
+    //     );
+
+    // this.postService.getByUserId(id).subscribe(
+    //   (response) => {
+    //     this.showLoader = false;
+    //     this.posts = response;
+    //   },
+    //   (error) => {
+    //     this.showLoader = false;
+    //     this.handleError(error);
+    //   }
+    // );
+    //   },
+    //   (error) => {
+    //     this.handleError(error);
+    //   }
+    // );
 
     this.socket.OnFriendRequest().subscribe((response: any) => {
       if (this.user?._id === response?._id) {
@@ -136,7 +165,7 @@ export class UserProfileComponent implements OnInit {
     );
 
     if (this.currentUser) {
-      if (friend && friend.status) {
+      if (friend && friend?.status) {
         if (friend.status === 'pending') {
           this.user.status = 'Cancel Request';
         } else if (friend.status === 'sent') {
@@ -147,7 +176,7 @@ export class UserProfileComponent implements OnInit {
           this.user.status = 'Remove Friend';
         }
       } else {
-        this.user.status = 'Send Request';
+        if (this.user) this.user.status = 'Send Request';
       }
     }
   }

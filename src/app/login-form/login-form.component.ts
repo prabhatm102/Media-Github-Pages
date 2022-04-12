@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { BadInput } from '../common/bad-input';
 import { LoginService } from '../services/login.service';
@@ -16,7 +16,8 @@ export class LoginFormComponent implements OnInit {
   constructor(
     private service: LoginService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private route: ActivatedRoute
   ) {
     this.form = new FormGroup({
       email: new FormControl('', [
@@ -56,7 +57,9 @@ export class LoginFormComponent implements OnInit {
                 closeButton: true,
                 timeOut: 1000,
               });
-              this.router.navigate(['/']);
+              let returnUrl =
+                this.route.snapshot.queryParams['returnUrl'] || '/';
+              this.router.navigate([returnUrl]);
             }
           },
           (error) => {

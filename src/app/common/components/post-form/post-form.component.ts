@@ -57,18 +57,18 @@ export class PostFormComponent implements OnInit {
       formData.append('postFile', this.form.get('fileSource').value);
     }
 
-    this.service.createById(this?.user?._id, formData).subscribe(
-      (response) => {
+    this.service
+      .createById(this?.user?._id, formData)
+      .then((response) => {
         this.newPostEvent.emit(response);
         this.form.reset();
         this.localPostImageUrl = '';
-      },
-      (error) => {
+      })
+      .catch((error) => {
         this.form.reset();
         this.localPostImageUrl = '';
         this.handleError(error);
-      }
-    );
+      });
   }
 
   // updateImageUrl(url: any) {
@@ -93,10 +93,10 @@ export class PostFormComponent implements OnInit {
     }
   }
 
-  deletePostImage(){
-     this.localPostImageUrl = '';
-     this.form.controls['postFile'].setValue('');
-     this.form.controls['fileSource'].setValue('');
+  deletePostImage() {
+    this.localPostImageUrl = '';
+    this.form.controls['postFile'].setValue('');
+    this.form.controls['fileSource'].setValue('');
   }
 
   handleError(error: any) {

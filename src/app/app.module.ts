@@ -34,7 +34,6 @@ import { CommentFormComponent } from './common/components/comment-form/comment-f
 import { CommentsComponent } from './comments/comments.component';
 import { ToggleCommentsComponent } from './common/components/toggle-comments/toggle-comments.component';
 import { AuthService } from './shared/auth.service';
-import { NGCComponent } from './ngc/ngc.component';
 import { ClipboardModule } from 'ngx-clipboard';
 import { ToastrModule } from 'ngx-toastr';
 import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
@@ -75,7 +74,6 @@ const config: SocketIoConfig = {
     CommentsComponent,
     CommentFormComponent,
     ToggleCommentsComponent,
-    NGCComponent,
   ],
   imports: [
     CommonModule,

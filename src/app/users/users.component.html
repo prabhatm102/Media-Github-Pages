@@ -13,7 +13,7 @@
             <div class="col mt-5">
                 <div class="text-end">
                     <!-- showing page {{page}} out of {{(users?.length)/itemsPerPage | number:'1.0-0'}} -->
-                    <pagination-controls #u (pageChange)="pageChanged($event)" id="users_pagination"
+                    <pagination-controls #u (pageChange)="pageChanged($event)" id="usersPagination"
                         previousLabel="Previous" [maxSize]="7" [directionLinks]="true" [responsive]="false"
                         nextLabel="Next" screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
                         screenReaderCurrentLabel="You're on page">>
@@ -37,12 +37,13 @@
                     </thead>
                     <tbody>
                         <tr
-                            *ngFor="let user of users | paginate:{id:'users_pagination',itemsPerPage,currentPage:page,totalItems:users?.length}">
+                            *ngFor="let user of users | paginate:{id:'usersPagination',itemsPerPage,currentPage:page,totalItems:users?.length}">
                             <td>
                                 <a [routerLink]="['profile',user?._id]" data-bs-toggle="tooltip"
-                                    data-bs-placement="bottom" [title]="'View '+user.name + 's Profile'">
+                                    data-bs-placement="bottom" [title]="'View '+user?.name + 's Profile'">
 
-                                    <img [src]="imageUrl+user.file" class="img-fluid" style="width:30px;height: 30px;"
+                                    <img [src]="(!user?.file && tempUrl) || imageUrl+user?.file | sanitizerUrl"
+                                        class="img-fluid" style="width:30px;height: 30px;"
                                         onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'">
                                 </a>
                             </td>
@@ -81,14 +82,14 @@
                             </td>
                             <td>
                                 <button type="button" (click)="selectUser(user)"
-                                    *ngIf="(currentUser?.isAdmin && !user.isAdmin)|| user?._id===currentUser._id"
+                                    *ngIf="(currentUser?.isAdmin && !user.isAdmin)|| user?._id===currentUser?._id"
                                     class="btn btn-sm btn-outline-primary m-1" data-bs-toggle="modal"
                                     data-bs-target="#updateModal" [attr.data-bs-whatever]="user"><i
                                         class="bi bi-pencil-square"></i></button>
 
 
                                 <button class="btn btn-sm btn-outline-danger m-1"
-                                    *ngIf="(currentUser?.isAdmin && !user.isAdmin)  || user?._id===currentUser._id"
+                                    *ngIf="(currentUser?.isAdmin && !user.isAdmin)  && user?._id!==currentUser._id"
                                     (click)="deleteUser(user)">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -150,9 +151,6 @@
                             </div>
                             <div class="text-danger" *ngIf="email.errors?.['maxlength']">Email should be maximum
                                 {{email?.errors?.['maxlength']?.requiredLength}} characters</div>
-
-
-
                         </div>
 
                     </div>
@@ -162,11 +160,17 @@
                         <label class="btn">
                             <span>
                                 <div class="text-center m-2 text-primary"
-                                    *ngIf="selectedUser?.file && (file.value || localImageUrl)">
+                                    *ngIf="(selectedUser?.file || localImageUrl) && (file.value || localImageUrl)">
                                     <img [src]="(localImageUrl ) || (imageUrl+selectedUser?.file) | sanitizerUrl"
-                                        onerror="this.parentElement.innerHTML='<i class=bi-image-alt></i>'"
-                                        class="img-fluid img-thumbnail rounded h-50 w-50" />
+                                        onload="this.style='display:block;'"
+                                        onerror="this.style='display:none';this.width=0"
+                                        class="img-fluid img-thumbnail rounded h-50 w-50" #userImg />
+                                    <i class=bi-image-alt
+                                        *ngIf="userImg.width<=0 && !userImg.src.startsWith('blob')"></i>
+
+
                                 </div>
+
                             </span>
                             <input type="file" style="display:none" class="form-control" name="file"
                                 (change)="onFileSelect($event)" formControlName="file" name="file" id="file" />

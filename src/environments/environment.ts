@@ -12,6 +12,7 @@ export const environment = {
   socketUrl: 'https://media-2.herokuapp.com/',
   imageUrl: 'https://media-2.herokuapp.com/uploads/',
   postImageUrl: 'https://media-2.herokuapp.com/posts/',
+  navBarBackground: '#a2bdf0',
 };
 
 /*

@@ -22,6 +22,7 @@ export class UsersComponent implements OnInit {
   selectedUser: any;
   imageUrl: string = '';
   localImageUrl: string = '';
+  tempUrl: string = '';
   showLoader: boolean = true;
   page: number = 1;
   itemsPerPage: number = 3;
@@ -121,6 +122,8 @@ export class UsersComponent implements OnInit {
     return users;
   }
   deleteUser(user: any) {
+    let index = this.users.findIndex((u: any) => u?._id === user?._id);
+
     Swal.fire({
       title: 'Are you sure want to delete?',
       text: "You won't be able to revert this!",
@@ -130,15 +133,17 @@ export class UsersComponent implements OnInit {
       cancelButtonText: 'No, keep it',
     }).then((result) => {
       if (result.value) {
-        this.service.delete(user._id).subscribe(
+        this.users.splice(index, 1);
+        this.service.delete(user?._id).subscribe(
           (response) => {
-            let index = this.users.findIndex((u: any) => u._id === user._id);
+            // let index = this.users.findIndex((u: any) => u._id === user._id);
 
-            this.users.splice(index, 1);
+            // this.users.splice(index, 1);
 
             Swal.fire('Deleted!', 'User has been deleted.', 'success');
           },
           (error) => {
+            this.users.splice(index, 0, user);
             this.handleError(error);
           }
         );
@@ -189,7 +194,7 @@ export class UsersComponent implements OnInit {
       file: this.form.get('file').value,
     };
 
-    let prevdata = {
+    let prevData = {
       name: this.selectedUser.name,
       email: this.selectedUser.email,
       isActive: this.selectedUser.isActive,
@@ -197,26 +202,47 @@ export class UsersComponent implements OnInit {
       file: this.selectedUser.file,
     };
 
-    if (JSON.stringify(newData) === JSON.stringify(prevdata)) return;
+    if (JSON.stringify(newData) === JSON.stringify(prevData)) return;
 
-    this.service.update(this.selectedUser?._id, formData).subscribe(
+    let index = this.users?.findIndex(
+      (u: any) => u?._id === this?.selectedUser?._id
+    );
+    delete newData?.file;
+
+    this.users[index] = { ...this.users[index], ...newData };
+    if (this.form.get('fileSource')?.value) {
+      this.tempUrl = URL.createObjectURL(this.form.get('fileSource')?.value);
+      this.users[index].file = '';
+    }
+    this.form.reset();
+
+    this.selectedUser = '';
+
+    this.service.update(this.users[index]?._id, formData).subscribe(
       (response) => {
-        let index = this.users.findIndex(
-          (u: any) => u._id === this.selectedUser._id
-        );
-        this.users[index] = this.friendStatus([response.body])[0];
-        this.form.reset();
+        // let index = this.users.findIndex(
+        //   (u: any) => u._id === this.selectedUser._id
+        // );
+        // this.users[index] = this.friendStatus([response.body])[0];
+        // this.form.reset();
+        this.users[index].file = JSON.parse(
+          JSON.stringify(response.body)
+        )?.file;
 
-        if (this.currentUser._id === this.selectedUser._id) {
+        if (this.currentUser?._id === this.users[index]?._id) {
           localStorage.setItem(
             'authToken',
             response.headers.get('x-auth-token') || ''
           );
         }
-        this.selectedUser = '';
+        // this.selectedUser = '';
+        this.localImageUrl = '';
+        this.tempUrl = '';
       },
       (error) => {
-        this.form.reset();
+        this.users[index] = { ...this.users[index], ...prevData };
+        this.tempUrl = '';
+        // this.form.reset();
         this.localImageUrl = '';
         this.handleError(error);
       }
@@ -266,6 +292,7 @@ export class UsersComponent implements OnInit {
       } else {
         this.form.patchValue({ fileSource: file });
         this.localImageUrl = URL.createObjectURL(event.target.files[0]);
+        this.form.controls['file'].touched = true;
       }
     }
   }

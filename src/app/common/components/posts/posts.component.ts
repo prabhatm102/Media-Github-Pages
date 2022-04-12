@@ -7,6 +7,13 @@ import { ToastrService } from 'ngx-toastr';
 import { UnauthorisedError } from '../../unauthorised-error';
 import { BadInput } from '../../bad-input';
 import { NotFoundError } from '../../not-found-error';
+import {
+  filter,
+  debounceTime,
+  distinctUntilChanged,
+  tap,
+} from 'rxjs/operators';
+import { fromEvent } from 'rxjs';
 
 @Component({
   selector: 'posts',
@@ -22,10 +29,15 @@ export class PostsComponent implements OnInit {
   likedBy: any;
   localPostImageUrl: string = '';
   selectedPostImageUrl: string = '';
+  tempPostUrl: string = '';
 
   // posts: any = [];
   imageUrl: string;
   postImageUrl: string;
+
+  itemsPerPage: number = 5;
+  currentPage: number = 1;
+
   constructor(
     private service: PostsService,
     fb: FormBuilder,
@@ -209,33 +221,56 @@ export class PostsComponent implements OnInit {
       formData.append('postFile', this.form.get('fileSource').value);
 
     let newData = {
-      name: this.form.get('message').value,
+      message: this.form.get('message').value,
       postFile: this.form.get('postFile').value,
     };
 
     let prevData = {
-      name: this.selectedPost?.message || '',
+      message: this.selectedPost?.message || '',
       postFile: this.selectedPost?.postFile,
     };
 
     if (JSON.stringify(newData) === JSON.stringify(prevData)) return;
 
-    this.service.update(this.selectedPost?._id, formData).subscribe(
+    let index = this.posts.findIndex(
+      (u: any) => u._id === this.selectedPost._id
+    );
+
+    delete newData?.postFile;
+
+    this.posts[index] = {
+      ...this.posts[index],
+      ...newData,
+    };
+
+    if (this.form.get('fileSource')?.value) {
+      this.tempPostUrl = URL.createObjectURL(
+        this.form.get('fileSource')?.value
+      );
+      this.posts[index].postFile = 'temp';
+    }
+
+    this.form.reset();
+    this.selectedPost = '';
+
+    this.service.update(this.posts[index]?._id, formData).subscribe(
       (response) => {
-        let index = this.posts.findIndex(
-          (u: any) => u._id === this.selectedPost._id
-        );
-        this.posts[index] = response.body;
-        this.form.reset();
-        this.selectedPost = '';
         this.toastr.success('Post successfully updated', '', {
           progressBar: true,
           closeButton: true,
           onActivateTick: false,
           timeOut: 500,
         });
+        this.posts[index].postFile = JSON.parse(
+          JSON.stringify(response.body)
+        )?.postFile;
+        this.localPostImageUrl = '';
+        this.tempPostUrl = '';
       },
       (error) => {
+        this.posts[index] = { ...this.posts[index], ...prevData };
+        this.localPostImageUrl = '';
+        this.tempPostUrl = '';
         this.handleError(error);
       }
     );
@@ -272,4 +307,28 @@ export class PostsComponent implements OnInit {
         timeOut: 500,
       });
   }
+
+  pageChanged(event: any) {
+    this.currentPage = event;
+  }
+
+  // searchPost(input: HTMLInputElement) {
+  //   let keyup = fromEvent(input, 'keyup');
+  //   keyup
+  //     .pipe(
+  //       filter(Boolean),
+  //       debounceTime(400)
+  //       // distinctUntilChanged(),
+  //     )
+  //     .subscribe((result) => {
+  //       this.service.getAll(input.value).subscribe(
+  //         (response) => {
+  //           this.posts = response;
+  //         },
+  //         (error) => {
+  //           this.handleError(error);
+  //         }
+  //       );
+  //     });
+  // }
 }
